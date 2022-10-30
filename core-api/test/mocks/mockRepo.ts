@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Repository } from 'typeorm';
 
 const createMockRepo = (mockRepository: Partial<Repository<any>>) => {
   return {
@@ -6,9 +6,7 @@ const createMockRepo = (mockRepository: Partial<Repository<any>>) => {
     get: () => ({
       getRepository: (name: string) => {
         console.log(name);
-        return {
-          mockRepository,
-        };
+        return mockRepository;
       },
     }),
   };

@@ -1,6 +1,5 @@
 import { Appointment } from "@/entities/Appointment";
 import { BookAppointmentInput } from "@/models/appointments/BookAppointmentInput";
-import { NotImplementedException } from "@/models/errors/NotImplementedException";
 import { AppointmentService } from "@/services/AppointmentService";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 
@@ -19,6 +18,6 @@ export class AppointmentResolver {
   async bookAppointment(
     @Arg("bookAppointmentInput") bookAppointmentInput: BookAppointmentInput,
   ): Promise<Appointment> {
-    throw new NotImplementedException("bookAppointment");
+    return this.appointmentService.bookAppointment(bookAppointmentInput);
   }
 }

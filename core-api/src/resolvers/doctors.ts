@@ -1,7 +1,6 @@
 import { Doctor } from "@/entities/Doctor";
 import { Slot } from "@/models/appointments/Slot";
 import { AddDoctorInput } from "@/models/doctor/AddDoctorInput";
-import { NotImplementedException } from "@/models/errors/NotImplementedException";
 import { DoctorService } from "@/services/DoctorService";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 
@@ -20,7 +19,7 @@ export class DoctorResolver {
   async addDoctor(
     @Arg('doctor') doctor: AddDoctorInput,
   ): Promise<Doctor> {
-    throw new NotImplementedException("addDoctor: not implemented")
+    return this.doctorService.addDoctor(doctor)
   }
 
   @Query(() => [Slot])
@@ -28,6 +27,6 @@ export class DoctorResolver {
     @Arg('from') from: Date,
     @Arg('to') to: Date,
   ): Promise<Slot[]> {
-    throw new NotImplementedException("slots")
+    return this.doctorService.getAvailableSlots(from, to);
   }
 }

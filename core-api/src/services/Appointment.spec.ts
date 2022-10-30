@@ -1,12 +1,18 @@
-import { Appointment } from "@/entities/Appointment";
-import { Doctor } from "@/entities/Doctor";
-import { BookAppointmentInput } from "@/models/appointments/BookAppointmentInput";
-import { faker } from "@faker-js/faker";
-import createMockRepo from "@test/mocks/mockRepo";
-import { addDays, addMinutes, nextMonday, setHours, setMinutes } from "date-fns";
-import Container from "typedi";
-import { ConnectionManager, Repository } from "typeorm";
-import { AppointmentService } from "./AppointmentService";
+import { Appointment } from '@/entities/Appointment';
+import { Doctor } from '@/entities/Doctor';
+import { BookAppointmentInput } from '@/models/appointments/BookAppointmentInput';
+import { faker } from '@faker-js/faker';
+import createMockRepo from '@test/mocks/mockRepo';
+import {
+  addDays,
+  addMinutes,
+  nextMonday,
+  setHours,
+  setMinutes,
+} from 'date-fns';
+import Container from 'typedi';
+import { ConnectionManager, Repository } from 'typeorm';
+import { AppointmentService } from './AppointmentService';
 
 const mockRepo: Partial<Repository<Appointment>> = {};
 
@@ -20,10 +26,13 @@ describe('AppointmentService', () => {
       const doctor = new Doctor();
       doctor.id = 1;
 
-      const appointment = new Appointment()
+      const appointment = new Appointment();
 
       // set appointment start time to next monday at 2pm
-      const startTime = setMinutes(setHours(addDays(nextMonday(new Date()), 1), 14), 0);
+      const startTime = setMinutes(
+        setHours(addDays(nextMonday(new Date()), 1), 14),
+        0
+      );
       appointment.startTime = startTime;
       appointment.durationMinutes = 15;
       appointment.doctor = doctor;
@@ -32,20 +41,26 @@ describe('AppointmentService', () => {
         return Promise.resolve(appointment);
       });
 
+      mockRepo.save = jest.fn((app: any[]) => {
+        return Promise.resolve(app);
+      });
+
       const sut = Container.get(AppointmentService);
 
       const bookAppointmentInput: BookAppointmentInput = {
-        slot: { start: startTime, end: addMinutes(startTime, 15), doctorId: doctor.id },
+        slot: {
+          start: startTime,
+          end: addMinutes(startTime, 15),
+          doctorId: doctor.id,
+        },
         patientName: faker.name.firstName(),
         description: faker.lorem.lines(1),
       };
 
-      const call = () => {
-        sut.bookAppointment(bookAppointmentInput);
-      }
-
-      expect(call).toThrow(Error);
-      expect(call).toThrow("Appointment slot already taken");
+      await expect(sut.bookAppointment(bookAppointmentInput)).rejects.toThrow();
+      await expect(sut.bookAppointment(bookAppointmentInput)).rejects.toThrow(
+        'Appointment slot already taken'
+      );
     });
   });
 });
