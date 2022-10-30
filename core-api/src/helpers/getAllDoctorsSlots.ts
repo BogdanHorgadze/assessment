@@ -29,8 +29,8 @@ const getAllDoctorSlots = (
       interval
     ).map(([start, end]) => ({
       doctorId: id,
-      start: minutesToTime(start),
-      end: minutesToTime(end),
+      start: new Date(2022, 10, Number(minutesToTime(start).split(':')[0]), Number(minutesToTime(start).split(':')[1])),
+      end: new Date(2022, 10, Number(minutesToTime(end).split(':')[0]), Number(minutesToTime(end).split(':')[1])),
     }))
   );
 
