@@ -1,5 +1,4 @@
 import { Availability } from "./../entities/Availability";
-import { Appointment } from "./../entities/Appointment";
 import { Doctor } from "@/entities/Doctor";
 import { Slot } from "@/models/appointments/Slot";
 import { AddDoctorInput } from "@/models/doctor/AddDoctorInput";
@@ -8,7 +7,7 @@ import { Repository, MoreThanOrEqual, LessThanOrEqual, Raw } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { getDay, differenceInCalendarWeeks, format } from "date-fns";
 import getAllDoctorSlots from "@/helpers/getAllDoctorsSlots";
-import getFilteredSlots from "@/helpers/getfilteredSlots";
+
 @Service()
 export class DoctorService {
   constructor(
@@ -16,8 +15,6 @@ export class DoctorService {
     private readonly doctorRepo: Repository<Doctor>,
     @InjectRepository(Availability)
     private readonly availabilityRepo: Repository<Availability>,
-    @InjectRepository(Appointment)
-    private readonly appointmentRepo: Repository<Appointment>
   ) {}
 
   getDoctors() {
@@ -55,10 +52,6 @@ export class DoctorService {
       where: [...query],
     });
 
-    const appointments = await this.appointmentRepo.find({
-      relations: ["doctor"],
-    });
-
-    return getFilteredSlots(appointments, getAllDoctorSlots(avalibleDoctors));
+    return getAllDoctorSlots(avalibleDoctors);
   }
 }
