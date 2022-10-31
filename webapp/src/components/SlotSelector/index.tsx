@@ -6,9 +6,9 @@ import { isSameDay, format, isEqual } from 'date-fns';
 import moment from 'moment';
 import { DayPickerSingleDateController } from 'react-dates';
 
-import { Slot } from '@/types/domain';
-
 import { Container } from './styled';
+
+import { Slot } from '@/types/domain';
 
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
@@ -22,7 +22,7 @@ type Props = {
   styleProps?: FlexProps;
   slotLoading?: Slot;
   loadingSlots: boolean;
-}
+};
 
 const SlotSelector: FC<Props> = ({
   minimumStartDate,
@@ -35,15 +35,18 @@ const SlotSelector: FC<Props> = ({
   ...props
 }) => {
   const [date, setDate] = useState(
-    availableSlots?.[0]?.start || minimumStartDate,
+    new Date(availableSlots?.[0]?.start) || minimumStartDate
   );
 
-  const onSlotSelected = useCallback((slot: Slot) => {
-    onChange(slot);
-  }, [onChange]);
+  const onSlotSelected = useCallback(
+    (slot: Slot) => {
+      onChange(slot);
+    },
+    [onChange]
+  );
 
   const availableSlotsOnDate = useMemo(() => {
-    return availableSlots.filter((x) => isSameDay(x.start, date));
+    return availableSlots.filter((x) => isSameDay(new Date(x.start), date));
   }, [date, availableSlots]);
 
   const minStartDate = moment(minimumStartDate);
@@ -70,11 +73,11 @@ const SlotSelector: FC<Props> = ({
         }}
         {...props}
       />
-      <Flex flexDirection="column" px="12px" w="100%">
-        <Text fontSize="17px" mb="20px" mt="22px" textAlign="left">
-          {format(date, 'eeee, MMMM dd')}
+      <Flex flexDirection='column' px='12px' w='100%'>
+        <Text fontSize='17px' mb='20px' mt='22px' textAlign='left'>
+          {format(new Date(date), 'eeee, MMMM dd')}
         </Text>
-        <Box flexGrow={1} overflow="auto" position="relative">
+        <Box flexGrow={1} overflow='auto' position='relative'>
           {loadingSlots ? (
             <Progress />
           ) : (
@@ -90,18 +93,18 @@ const SlotSelector: FC<Props> = ({
                   _hover={{
                     backgroundColor: 'white.10',
                   }}
-                  borderColor="white.10"
-                  colorScheme="gray"
-                  fontSize="16px"
-                  mb="8px"
+                  borderColor='white.10'
+                  colorScheme='gray'
+                  fontSize='16px'
+                  mb='8px'
                   onClick={() => onSlotSelected(slot)}
-                  py="16px"
-                  variant="outline"
-                  width="100%"
+                  py='16px'
+                  variant='outline'
+                  width='100%'
                   {...activeStyle}
                 >
-                  {format(slot.start, 'hh:mm a')}{' '}
-                  {isActive && <CheckIcon position="absolute" right="18px" />}
+                  {format(new Date(slot.start), 'hh:mm a')}{' '}
+                  {isActive && <CheckIcon position='absolute' right='18px' />}
                 </Button>
               );
             })

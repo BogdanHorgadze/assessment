@@ -24,7 +24,7 @@ export const Items = () => {
     } catch (ex) {
       console.log(ex);
     }
-  }, [addItem]);
+  }, [addItem, refetch]);
 
   if (loading) {
     return <Box>Loading...</Box>;
