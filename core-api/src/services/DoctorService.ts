@@ -51,6 +51,6 @@ export class DoctorService {
       where: [...query],
     });
 
-    return getAllDoctorSlots(avalibleDoctors) as unknown as Slot[];
+    return getAllDoctorSlots(avalibleDoctors);
   }
 }
