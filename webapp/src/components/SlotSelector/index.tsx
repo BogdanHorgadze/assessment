@@ -73,38 +73,38 @@ const SlotSelector: FC<Props> = ({
         }}
         {...props}
       />
-      <Flex flexDirection='column' px='12px' w='100%'>
-        <Text fontSize='17px' mb='20px' mt='22px' textAlign='left'>
-          {format(new Date(date), 'eeee, MMMM dd')}
+      <Flex flexDirection="column" px="12px" w="100%">
+        <Text fontSize="17px" mb="20px" mt="22px" textAlign="left">
+          {format(new Date(date), "eeee, MMMM dd")}
         </Text>
-        <Box flexGrow={1} overflow='auto' position='relative'>
+        <Box flexGrow={1} overflow="auto" position="relative">
           {loadingSlots ? (
             <Progress />
           ) : (
             availableSlotsOnDate.map((slot) => {
               const isActive = value && isEqual(value.start, slot?.start);
               const activeStyle = isActive && {
-                backgroundColor: 'teal.500',
-                border: 'none',
+                backgroundColor: "teal.500",
+                border: "none",
               };
               return (
                 <Button
                   key={slot.key}
                   _hover={{
-                    backgroundColor: 'white.10',
+                    backgroundColor: "white.10",
                   }}
-                  borderColor='white.10'
-                  colorScheme='gray'
-                  fontSize='16px'
-                  mb='8px'
+                  borderColor="white.10"
+                  colorScheme="gray"
+                  fontSize="16px"
+                  mb="8px"
                   onClick={() => onSlotSelected(slot)}
-                  py='16px'
-                  variant='outline'
-                  width='100%'
+                  py="16px"
+                  variant="outline"
+                  width="100%"
                   {...activeStyle}
                 >
-                  {format(new Date(slot.start), 'hh:mm a')}{' '}
-                  {isActive && <CheckIcon position='absolute' right='18px' />}
+                  {format(new Date(slot.start), "hh:mm a")}{" "}
+                  {isActive && <CheckIcon position="absolute" right="18px" />}
                 </Button>
               );
             })
