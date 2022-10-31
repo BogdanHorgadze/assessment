@@ -1,4 +1,4 @@
-I am so sorry for delay
+I am so sorry for delay, Please check my test task
  - did not implement the removal of a slot that has already been booked
  - did not implement receiving slots for a specific doctor
 
