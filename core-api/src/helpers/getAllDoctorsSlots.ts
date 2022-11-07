@@ -1,5 +1,5 @@
 const timeToMinutes = (time: string) => {
-  const [hours, minutes] = time.split(':').map(Number);
+  const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
 };
 
@@ -8,8 +8,8 @@ const minutesToTime = (totalMinutes: number) => {
   const minutes = totalMinutes % 60;
 
   return [hours, minutes]
-    .map((number) => String(number).padStart(2, '0'))
-    .join(':');
+    .map((number) => String(number).padStart(2, "0"))
+    .join(":");
 };
 
 const intervals = (start: number, end: number, interval: number) =>
@@ -19,19 +19,24 @@ const intervals = (start: number, end: number, interval: number) =>
   ]);
 
 const getAllDoctorSlots = (
-  doctors: { id: number; startTimeUtc: string; endTimeUtc: string }[],
+  doctors: {
+    id: number;
+    startTimeUtc: string;
+    endTimeUtc: string;
+    doctor: { id: number };
+  }[],
   interval = 15
 ) =>
-  doctors.flatMap(({ id, startTimeUtc, endTimeUtc }) =>
+  doctors.flatMap(({ startTimeUtc, endTimeUtc, doctor }) =>
     intervals(
       timeToMinutes(startTimeUtc),
       timeToMinutes(endTimeUtc),
       interval
     ).map(([start, end]) => ({
-      doctorId: id,
-      start: new Date(2022, 10, 8, Number(minutesToTime(start).split(':')[0]), Number(minutesToTime(start).split(':')[1]), 0, 0),
-      end: new Date(2022, 10, 8, Number(minutesToTime(end).split(':')[0]), Number(minutesToTime(end).split(':')[1]), 0, 0),
+      doctorId: doctor.id,
+      start: minutesToTime(start),
+      end: minutesToTime(end),
     }))
   );
 
-export default getAllDoctorSlots
+export default getAllDoctorSlots;
