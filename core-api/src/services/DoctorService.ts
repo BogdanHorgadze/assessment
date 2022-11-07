@@ -1,19 +1,20 @@
-import { Availability } from './../entities/Availability';
-import { Doctor } from '@/entities/Doctor';
-import { Slot } from '@/models/appointments/Slot';
-import { AddDoctorInput } from '@/models/doctor/AddDoctorInput';
-import { Service } from 'typedi';
-import { Repository, MoreThanOrEqual, LessThanOrEqual, Raw } from 'typeorm';
-import { InjectRepository } from 'typeorm-typedi-extensions';
-import { getDay, differenceInCalendarWeeks, format } from 'date-fns';
-import getAllDoctorSlots from '@/helpers/getAllDoctorsSlots';
+import { Availability } from "./../entities/Availability";
+import { Doctor } from "@/entities/Doctor";
+import { Slot } from "@/models/appointments/Slot";
+import { AddDoctorInput } from "@/models/doctor/AddDoctorInput";
+import { Service } from "typedi";
+import { Repository, MoreThanOrEqual, LessThanOrEqual, Raw } from "typeorm";
+import { InjectRepository } from "typeorm-typedi-extensions";
+import { getDay, differenceInCalendarWeeks, format } from "date-fns";
+import getAllDoctorSlots from "@/helpers/getAllDoctorsSlots";
+
 @Service()
 export class DoctorService {
   constructor(
     @InjectRepository(Doctor)
     private readonly doctorRepo: Repository<Doctor>,
     @InjectRepository(Availability)
-    private readonly availabilityRepo: Repository<Availability>
+    private readonly availabilityRepo: Repository<Availability>,
   ) {}
 
   getDoctors() {
@@ -25,8 +26,8 @@ export class DoctorService {
   }
 
   async getAvailableSlots(from: Date, to: Date): Promise<Slot[]> {
-    const fromTime = format(from, 'HH:mm');
-    const toTime = format(to, 'HH:mm');
+    const fromTime = format(from, "HH:mm");
+    const toTime = format(to, "HH:mm");
     const fromDay = getDay(from);
     const toDay = getDay(to);
     const query =
