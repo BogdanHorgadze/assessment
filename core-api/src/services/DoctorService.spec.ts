@@ -1,11 +1,11 @@
-import { Appointment } from '@/entities/Appointment';
-import { Availability } from '@/entities/Availability';
-import { Doctor } from '@/entities/Doctor';
-import createMockRepo from '@test/mocks/mockRepo';
-import { addDays, nextMonday, setHours, setMinutes } from 'date-fns';
-import Container from 'typedi';
-import { ConnectionManager, Repository } from 'typeorm';
-import { DoctorService } from './DoctorService';
+import { Appointment } from "@/entities/Appointment";
+import { Availability } from "@/entities/Availability";
+import { Doctor } from "@/entities/Doctor";
+import createMockRepo from "@test/mocks/mockRepo";
+import { addDays, nextMonday, setHours, setMinutes } from "date-fns";
+import Container from "typedi";
+import { ConnectionManager, Repository } from "typeorm";
+import { DoctorService } from "./DoctorService";
 
 const mockRepo: Partial<Repository<Availability>> = {};
 
