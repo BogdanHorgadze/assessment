@@ -11,6 +11,9 @@ api.post('').send({
         id
         startTime
         durationMinutes
+        doctor {
+          id
+        }
       }
     }
 `,

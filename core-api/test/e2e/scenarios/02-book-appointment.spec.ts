@@ -13,7 +13,7 @@ const api = createApi();
 
 describe('Book appointment scenario', () => {
   it('should book appointment successfully', async () => {
-    const from = setMinutes(setHours(addDays(nextMonday(new Date()), 1), 9), 0);
+    const from = setMinutes(setHours(addDays(nextMonday(new Date()), 3), 9), 0);
     const to = addDays(from, 7);
     const slotsRes = await fetchSlots(api, to, from);
 

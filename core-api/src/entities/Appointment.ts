@@ -18,6 +18,7 @@ export class Appointment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field(() => Doctor)
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments)
   @JoinColumn({ name: "doctorId" })
   doctor: Doctor;

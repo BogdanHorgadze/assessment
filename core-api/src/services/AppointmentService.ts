@@ -1,9 +1,9 @@
-import { Appointment } from '@/entities/Appointment';
-import { Doctor } from '@/entities/Doctor';
-import { BookAppointmentInput } from '@/models/appointments/BookAppointmentInput';
-import { Service } from 'typedi';
-import { Repository } from 'typeorm';
-import { InjectRepository } from 'typeorm-typedi-extensions';
+import { Appointment } from "@/entities/Appointment";
+import { Doctor } from "@/entities/Doctor";
+import { BookAppointmentInput } from "@/models/appointments/BookAppointmentInput";
+import { Service } from "typedi";
+import { Repository } from "typeorm";
+import { InjectRepository } from "typeorm-typedi-extensions";
 
 @Service()
 export class AppointmentService {
@@ -32,9 +32,10 @@ export class AppointmentService {
         appoitment.startTime = start;
         appoitment.durationMinutes = 15;
         appoitment.doctor = doctor;
-        return this.appointmentRepo.save(appoitment);
+        const saved = await this.appointmentRepo.save(appoitment);
+        return { ...saved, doctor } as Appointment;
       }
-      throw new Error('Appointment slot already taken');
+      throw new Error("Appointment slot already taken");
     } catch (e) {
       throw new Error(e.message);
     }
