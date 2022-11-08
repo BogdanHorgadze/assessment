@@ -52,7 +52,7 @@ const Appointments = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const minimumStartDate = new Date(slots?.[0]?.start);
   const maximumStartDate = minimumStartDate && addDays(minimumStartDate, 30);
-  console.log(selectedSlot,'sd');
+
   const generateSlots = (slots: Partial<SlotWithKey>[] | undefined) =>
     slots?.map(slot => ({
       start: new Date(slot.start),
