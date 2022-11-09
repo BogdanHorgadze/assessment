@@ -24,9 +24,10 @@ export class DoctorResolver {
 
   @Query(() => [Slot])
   async slots(
+    @Arg('doctorId') doctorId: number,
     @Arg('from') from: Date,
     @Arg('to') to: Date,
   ): Promise<Slot[]> {
-    return this.doctorService.getAvailableSlots(from, to);
+    return this.doctorService.getAvailableSlots(doctorId, from, to);
   }
 }

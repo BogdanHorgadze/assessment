@@ -53,7 +53,7 @@ describe('DoctorService', () => {
         0
       );
       const to = addDays(from, 7);
-      const slots = await sut.getAvailableSlots(from, to);
+      const slots = await sut.getAvailableSlots(1, from, to);
 
       const slotsOnMonday = ((17 - 9) * 60) / 15;
       const slotsOnTuesdayMorning = ((12 - 9) * 60) / 15;
@@ -113,7 +113,7 @@ describe('DoctorService', () => {
         0
       );
       const to = addDays(from, 7);
-      const slots = await sut.getAvailableSlots(from, to);
+      const slots = await sut.getAvailableSlots(1, from, to);
 
       const slotsOnMonday = ((17 - 9) * 60) / 15;
       const slotsOnTuesdayMorning = ((12 - 9) * 60) / 15;
