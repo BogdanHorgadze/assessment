@@ -23,35 +23,21 @@ const getAllDoctorSlots = (
     id: number;
     startTimeUtc: string;
     endTimeUtc: string;
+    dayOfWeek: number,
     doctor: { id: number };
   }[],
   interval = 15
 ) =>
-  doctors.flatMap(({ id, startTimeUtc, endTimeUtc }) =>
+  doctors.flatMap(({ dayOfWeek, doctor, startTimeUtc, endTimeUtc }) =>
     intervals(
       timeToMinutes(startTimeUtc),
       timeToMinutes(endTimeUtc),
       interval
     ).map(([start, end]) => ({
-      doctorId: id,
-      start: new Date(
-        2022,
-        10,
-        8,
-        Number(minutesToTime(start).split(":")[0]),
-        Number(minutesToTime(start).split(":")[1]),
-        0,
-        0
-      ),
-      end: new Date(
-        2022,
-        10,
-        8,
-        Number(minutesToTime(end).split(":")[0]),
-        Number(minutesToTime(end).split(":")[1]),
-        0,
-        0
-      ),
+      dayOfWeek,
+      doctorId: doctor.id,
+      start: minutesToTime(start),
+      end: minutesToTime(end),
     }))
   );
 

@@ -1,12 +1,14 @@
 import { Availability } from "./../entities/Availability";
+import { Appointment } from "./../entities/Appointment";
 import { Doctor } from "@/entities/Doctor";
 import { Slot } from "@/models/appointments/Slot";
 import { AddDoctorInput } from "@/models/doctor/AddDoctorInput";
 import { Service } from "typedi";
 import { Repository, MoreThanOrEqual, LessThanOrEqual, Raw } from "typeorm";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { getDay, differenceInCalendarWeeks, format } from "date-fns";
+import { getDay, differenceInWeeks, format } from "date-fns";
 import getAllDoctorSlots from "@/helpers/getAllDoctorsSlots";
+import getFilteredSlots from "@/helpers/getFilteredSlots";
 
 @Service()
 export class DoctorService {
@@ -15,6 +17,8 @@ export class DoctorService {
     private readonly doctorRepo: Repository<Doctor>,
     @InjectRepository(Availability)
     private readonly availabilityRepo: Repository<Availability>,
+    @InjectRepository(Appointment)
+    private readonly appointmentRepo: Repository<Appointment>
   ) {}
 
   getDoctors() {
@@ -30,8 +34,9 @@ export class DoctorService {
     const toTime = format(to, "HH:mm");
     const fromDay = getDay(from);
     const toDay = getDay(to);
+
     const query =
-      differenceInCalendarWeeks(to, from) >= 1
+      differenceInWeeks(to, from) >= 1
         ? []
         : [
             {
@@ -50,8 +55,13 @@ export class DoctorService {
           ];
     const avalibleDoctors = await this.availabilityRepo.find({
       where: [...query],
+      relations: ["doctor"],
     });
 
-    return getAllDoctorSlots(avalibleDoctors);
+    const appointments = await this.appointmentRepo.find({
+      relations: ["doctor"],
+    });
+
+    return getFilteredSlots(appointments, getAllDoctorSlots(avalibleDoctors));
   }
 }
