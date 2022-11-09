@@ -1,11 +1,16 @@
 import React, { FC } from 'react';
 
+import { ApolloQueryResult } from '@apollo/client';
 import { Box, Button, Flex, Input, Text } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FieldValues, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { Slot, useBookAppointmentMutation } from '@/generated/core.graphql';
+import {
+  Slot,
+  SlotsQuery,
+  useBookAppointmentMutation,
+} from '@/generated/core.graphql';
 
 const schema = yup
   .object({
@@ -14,13 +19,17 @@ const schema = yup
   .required();
 
 interface Props {
-  selectedSlot: Slot;
   onClose: () => void;
+  refetch: () => Promise<ApolloQueryResult<SlotsQuery>>;
+  selectedSlot: Slot;
 }
 
-export const AppointmentForm: FC<Props> = ({ selectedSlot, onClose }) => {
-  const [bookAppointment, { loading: addingAppointments, error }] =
-    useBookAppointmentMutation();
+export const AppointmentForm: FC<Props> = ({
+  onClose,
+  refetch,
+  selectedSlot,
+}) => {
+  const [bookAppointment, { loading: addingAppointments, error }] = useBookAppointmentMutation();
   const {
     register,
     handleSubmit,
@@ -39,6 +48,8 @@ export const AppointmentForm: FC<Props> = ({ selectedSlot, onClose }) => {
           },
         },
       });
+      await refetch();
+      onClose();
     } catch (ex) {
       console.log(ex);
     }
@@ -56,7 +67,9 @@ export const AppointmentForm: FC<Props> = ({ selectedSlot, onClose }) => {
           {...register('patientName')}
           placeholder='enter your name'
         />
-        <Text color="red">{errors?.patientName && errors.patientName.message as string}</Text>
+        <Text color='red'>
+          {errors?.patientName && (errors.patientName.message as string)}
+        </Text>
         <Input
           mb='15'
           {...register('description')}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import {
   Heading,
@@ -15,10 +15,8 @@ import {
 import {
   addDays,
   nextMonday,
-  parseISO,
   setHours,
   setMinutes,
-  format,
 } from 'date-fns';
 
 import { AppointmentForm } from '@/components/AppointmentForm/AppointmentForm';
@@ -26,7 +24,6 @@ import DoctorSelector from '@/components/DoctorSelector';
 import SlotSelector from '@/components/SlotSelector';
 import {
   Doctor,
-  SlotsQuery,
   useDoctorsQuery,
   useSlotsQuery,
 } from '@/generated/core.graphql';
@@ -39,7 +36,11 @@ const Appointments = () => {
   );
   const to = useMemo(() => addDays(from, 7), [from]);
   const { data, loading } = useDoctorsQuery();
-  const { data: slotsData, loading: isLoadingSlots } = useSlotsQuery({
+  const {
+    data: slotsData,
+    loading: isLoadingSlots,
+    refetch,
+  } = useSlotsQuery({
     variables: {
       to,
       from,
@@ -54,16 +55,20 @@ const Appointments = () => {
   const maximumStartDate = minimumStartDate && addDays(minimumStartDate, 30);
 
   const generateSlots = (slots: Partial<SlotWithKey>[] | undefined) =>
-    slots?.map(slot => ({
+    slots?.map((slot) => ({
       start: new Date(slot.start),
       end: new Date(slot.end),
       ...slot,
     }));
 
-  const onSlotSelect = (slot: SlotWithKey) => {
-    setSelectedSlot(slot);
-    onOpen();
-  };
+  const onSlotSelect = useCallback(
+    (slot: SlotWithKey) => {
+      setSelectedSlot(slot);
+      onOpen();
+    },
+    [onOpen]
+  );
+
 
   useEffect(() => {
     if (selectedDoctor) {
@@ -112,7 +117,11 @@ const Appointments = () => {
           <ModalHeader>Book An Appontment</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <AppointmentForm selectedSlot={selectedSlot} onClose={onClose} />
+            <AppointmentForm
+              onClose={onClose}
+              refetch={refetch}
+              selectedSlot={selectedSlot}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
