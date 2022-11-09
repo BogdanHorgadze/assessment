@@ -29,39 +29,48 @@ export class DoctorService {
     return this.doctorRepo.save(doctor);
   }
 
-  async getAvailableSlots(from: Date, to: Date): Promise<Slot[]> {
+  async getAvailableSlots(
+    doctorId: number,
+    from: Date,
+    to: Date
+  ): Promise<Slot[]> {
     const fromTime = format(from, "HH:mm");
     const toTime = format(to, "HH:mm");
     const fromDay = getDay(from);
     const toDay = getDay(to);
-
     const query =
       differenceInWeeks(to, from) >= 1
-        ? []
+        ? [{ doctor: doctorId }]
         : [
             {
+              doctor: doctorId,
               dayOfWeek: Raw(
                 (alias) => `${alias} > ${fromDay} AND ${alias} < ${toDay}`
               ),
             },
             {
+              doctor: doctorId,
               dayOfWeek: fromDay,
               endTimeUtc: MoreThanOrEqual(fromTime),
             },
             {
+              doctor: doctorId,
               dayOfWeek: toDay,
               startTimeUtc: LessThanOrEqual(toTime),
             },
           ];
+
     const avalibleDoctors = await this.availabilityRepo.find({
       where: [...query],
       relations: ["doctor"],
     });
 
     const appointments = await this.appointmentRepo.find({
+      where: { doctor: doctorId },
       relations: ["doctor"],
     });
 
-    return getFilteredSlots(appointments, getAllDoctorSlots(avalibleDoctors));
+    const generatedSlots = getAllDoctorSlots(avalibleDoctors);
+    return getFilteredSlots(appointments, generatedSlots);
   }
 }
