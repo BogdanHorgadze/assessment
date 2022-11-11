@@ -12,50 +12,45 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from '@chakra-ui/react';
-import {
-  addDays,
-  nextMonday,
-  setHours,
-  setMinutes,
-} from 'date-fns';
+import { addDays, getDay, nextMonday, setHours, setMinutes } from 'date-fns';
 
 import { AppointmentForm } from '@/components/AppointmentForm/AppointmentForm';
 import DoctorSelector from '@/components/DoctorSelector';
 import SlotSelector from '@/components/SlotSelector';
 import {
   Doctor,
+  Slot,
   useDoctorsQuery,
-  useSlotsQuery,
+  useSlotsLazyQuery,
 } from '@/generated/core.graphql';
 import { SlotWithKey } from '@/types/domain';
 
 const Appointments = () => {
   const from = useMemo(
-    () => setMinutes(setHours(addDays(nextMonday(new Date()), 1), 9), 0),
+    () => setMinutes(setHours(nextMonday(new Date()), 9), 0),
     []
   );
-  const to = useMemo(() => addDays(from, 7), [from]);
-  const { data, loading } = useDoctorsQuery();
-  const {
-    data: slotsData,
-    loading: isLoadingSlots,
-    refetch,
-  } = useSlotsQuery({
-    variables: {
-      to,
-      from,
-    },
-  });
-  const [error, setError] = useState<string>();
+  const to = useMemo(() => setHours(addDays(from, 7), 10), [from]);
   const [slots, setSlots] = useState<SlotWithKey[]>([]);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor>();
-  const [selectedSlot, setSelectedSlot] = useState<SlotWithKey>(slots[0]);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({} as Doctor);
+  const [selectedSlot, setSelectedSlot] = useState<SlotWithKey>();
   const { isOpen, onClose, onOpen } = useDisclosure();
   const minimumStartDate = new Date(slots?.[0]?.start);
   const maximumStartDate = minimumStartDate && addDays(minimumStartDate, 30);
 
+  const { data, loading, error } = useDoctorsQuery();
+  const [getSlots, { data: slotsData, loading: isLoadingSlots, refetch }] =
+    useSlotsLazyQuery({
+      variables: {
+        doctorId: selectedDoctor?.id,
+        to,
+        from,
+      },
+    });
+
   const generateSlots = (slots: Partial<SlotWithKey>[] | undefined) =>
-    slots?.map((slot) => ({
+    slots?.map((slot, i) => ({
+      key: i,
       start: new Date(slot.start),
       end: new Date(slot.end),
       ...slot,
@@ -69,15 +64,21 @@ const Appointments = () => {
     [onOpen]
   );
 
-
   useEffect(() => {
-    if (selectedDoctor) {
-      const slots = generateSlots(slotsData?.slots);
-      setSlots(slots as SlotWithKey[]);
-    } else {
-      setSlots([]);
+    async function fetchSlots() {
+      if (selectedDoctor?.id) {
+        const { data } = await getSlots();
+        const slots = generateSlots(data?.slots);
+        slots?.forEach((slot) => {
+          console.log({ ...slot, start: new Date(slot.start) });
+        });
+        setSlots(slots as SlotWithKey[]);
+      } else {
+        setSlots([]);
+      }
     }
-  }, [selectedDoctor, slotsData?.slots]);
+    fetchSlots();
+  }, [getSlots, selectedDoctor, slotsData?.slots]);
 
   return (
     <>
@@ -120,7 +121,7 @@ const Appointments = () => {
             <AppointmentForm
               onClose={onClose}
               refetch={refetch}
-              selectedSlot={selectedSlot}
+              selectedSlot={selectedSlot as Slot}
             />
           </ModalBody>
         </ModalContent>

@@ -27,6 +27,7 @@ export type AddItemInput = {
 
 export type Appointment = {
   __typename?: 'Appointment';
+  doctor: Doctor;
   durationMinutes: Scalars['Float'];
   id: Scalars['Float'];
   startTime: Scalars['DateTime'];
@@ -83,6 +84,7 @@ export type Query = {
 
 
 export type QuerySlotsArgs = {
+  doctorId: Scalars['Float'];
   from: Scalars['DateTime'];
   to: Scalars['DateTime'];
 };
@@ -127,6 +129,7 @@ export type ItemsQuery = { __typename?: 'Query', items: Array<{ __typename?: 'It
 export type SlotsQueryVariables = Exact<{
   to: Scalars['DateTime'];
   from: Scalars['DateTime'];
+  doctorId: Scalars['Float'];
 }>;
 
 
@@ -275,8 +278,8 @@ export type ItemsQueryHookResult = ReturnType<typeof useItemsQuery>;
 export type ItemsLazyQueryHookResult = ReturnType<typeof useItemsLazyQuery>;
 export type ItemsQueryResult = Apollo.QueryResult<ItemsQuery, ItemsQueryVariables>;
 export const SlotsDocument = gql`
-    query Slots($to: DateTime!, $from: DateTime!) {
-  slots(to: $to, from: $from) {
+    query Slots($to: DateTime!, $from: DateTime!, $doctorId: Float!) {
+  slots(to: $to, from: $from, doctorId: $doctorId) {
     doctorId
     start
     end
@@ -298,6 +301,7 @@ export const SlotsDocument = gql`
  *   variables: {
  *      to: // value for 'to'
  *      from: // value for 'from'
+ *      doctorId: // value for 'doctorId'
  *   },
  * });
  */
