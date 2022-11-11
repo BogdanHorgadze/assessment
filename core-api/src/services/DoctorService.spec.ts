@@ -7,105 +7,153 @@ import Container from "typedi";
 import { ConnectionManager, Repository } from "typeorm";
 import { DoctorService } from "./DoctorService";
 
-const mockRepo: Partial<Repository<Doctor>> = {};
+export const mockRepoAvailability: Partial<Repository<Availability>> = {};
+export const mockRepoAppointment: Partial<Repository<Appointment>> = {};
 
-describe('DoctorService', () => {
+describe("DoctorService", () => {
   beforeAll(() => {
-    Container.set(ConnectionManager, createMockRepo(mockRepo));
+    Container.set(ConnectionManager, {
+      has: () => true,
+      get: () => ({
+        getRepository: (repositoryType: any) => {
+          switch (repositoryType) {
+            case Appointment:
+              return mockRepoAppointment;
+            case Availability:
+              return mockRepoAvailability;
+            default:
+              console.warn(`No mock repository found for ${repositoryType}`);
+              return null;
+          }
+        },
+      }),
+    });
   });
 
-  describe('slots query', () => {
-    it('should return all slots for doctor', async () => {
+  describe("slots query", () => {
+    it("should return all slots for doctor", async () => {
       const doctor = new Doctor();
-      doctor.availability = [{
-        dayOfWeek: 1, // Monday
-        startTimeUtc: '09:00',
-        endTimeUtc: '17:00',
-      }, {
-        dayOfWeek: 2, // Tuesday
-        startTimeUtc: '09:00',
-        endTimeUtc: '12:00',
-      }, {
-        dayOfWeek: 2, // Wednesday
-        startTimeUtc: '14:00',
-        endTimeUtc: '17:00', 
-      }].map((a) => {
+      doctor.id = 1;
+      doctor.name = "doctor1";
+      doctor.availability = [
+        {
+          dayOfWeek: 1, // Monday
+          startTimeUtc: "09:00",
+          endTimeUtc: "17:00",
+        },
+        {
+          dayOfWeek: 2, // Tuesday
+          startTimeUtc: "09:00",
+          endTimeUtc: "12:00",
+        },
+        {
+          dayOfWeek: 2, // Tuesday
+          startTimeUtc: "14:00",
+          endTimeUtc: "17:00",
+        },
+      ].map((a) => {
         const availability = new Availability();
+        availability.doctor = doctor;
         availability.dayOfWeek = a.dayOfWeek;
         availability.startTimeUtc = a.startTimeUtc;
         availability.endTimeUtc = a.endTimeUtc;
         return availability;
       });
 
-      mockRepo.find = jest.fn(() => {
-        return Promise.resolve([doctor]);
+      mockRepoAvailability.find = jest.fn(() => {
+        return Promise.resolve(doctor.availability);
+      });
+
+      mockRepoAppointment.find = jest.fn(() => {
+        return Promise.resolve([]);
       });
 
       const sut = Container.get(DoctorService);
 
       // from 9am next monday
-      const from = setMinutes(setHours(addDays(nextMonday(new Date()), 1), 9), 0);
+      const from = setMinutes(
+        setHours(nextMonday(new Date()), 9),
+        0
+      );
       const to = addDays(from, 7);
-      const slots = await sut.getAvailableSlots(from, to);
-      
+      const slots = await sut.getAvailableSlots(doctor.id, from, to);
+
       const slotsOnMonday = ((17 - 9) * 60) / 15;
-      const slotsOnTuesdayMorning = ((12-9)*60) / 15;
-      const slotsOnTuesdayAfternoon = ((17-14)*60) / 15;
-      const totalSlots = slotsOnMonday + slotsOnTuesdayAfternoon + slotsOnTuesdayMorning;
+      const slotsOnTuesdayMorning = ((12 - 9) * 60) / 15;
+      const slotsOnTuesdayAfternoon = ((17 - 14) * 60) / 15;
+      const totalSlots =
+        slotsOnMonday + slotsOnTuesdayAfternoon + slotsOnTuesdayMorning;
 
       expect(slots.length).toBe(totalSlots);
     });
 
     it('should not return slot if appointment exists for doctor', async () => {
       const doctor = new Doctor();
-      doctor.availability = [{
-        dayOfWeek: 1,
-        startTimeUtc: '09:00',
-        endTimeUtc: '17:00',
-      }, {
-        dayOfWeek: 2,
-        startTimeUtc: '09:00',
-        endTimeUtc: '12:00',
-      }, {
-        dayOfWeek: 2,
-        startTimeUtc: '14:00',
-        endTimeUtc: '17:00', 
-      }].map((a) => {
+      doctor.id = 1;
+      doctor.name = "doctor1";
+      doctor.availability = [
+        {
+          dayOfWeek: 1,
+          startTimeUtc: '09:00',
+          endTimeUtc: '17:00',
+        },
+        {
+          dayOfWeek: 2,
+          startTimeUtc: '09:00',
+          endTimeUtc: '12:00',
+        },
+        {
+          dayOfWeek: 2,
+          startTimeUtc: '14:00',
+          endTimeUtc: '17:00',
+        },
+      ].map((a) => {
         const availability = new Availability();
+        availability.doctor = doctor;
         availability.dayOfWeek = a.dayOfWeek;
         availability.startTimeUtc = a.startTimeUtc;
         availability.endTimeUtc = a.endTimeUtc;
         return availability;
       });
-      
-      const appointment = new Appointment()
+
+      const appointment = new Appointment();
 
       // set appointment start time to next monday at 2pm
-      const startTime = setMinutes(setHours(addDays(nextMonday(new Date()), 1), 14), 0);
+      const startTime = setMinutes(
+        setHours(addDays(nextMonday(new Date()), 1), 14),
+        0
+      );
+      appointment.doctor = doctor;
       appointment.startTime = startTime;
       appointment.durationMinutes = 15;
-      doctor.appointments = [ 
-        appointment,
-      ]
+      doctor.appointments = [appointment];
 
-      mockRepo.find = jest.fn(() => {
-        return Promise.resolve([doctor]);
+      mockRepoAvailability.find = jest.fn(() => {
+        return Promise.resolve(doctor.availability);
+      });
+
+      mockRepoAppointment.find = jest.fn(() => {
+        return Promise.resolve([appointment]);
       });
 
       const sut = Container.get(DoctorService);
 
       // from 9am next monday
-      const from = setMinutes(setHours(addDays(nextMonday(new Date()), 1), 9), 0);
+      const from = setMinutes(
+        setHours(nextMonday(new Date()), 9),
+        0
+      );
       const to = addDays(from, 7);
-      const slots = await sut.getAvailableSlots(from, to);
-      
+      const slots = await sut.getAvailableSlots(doctor.id, from, to);
+
       const slotsOnMonday = ((17 - 9) * 60) / 15;
-      const slotsOnTuesdayMorning = ((12-9)*60) / 15;
-      const slotsOnTuesdayAfternoon = ((17-14)*60) / 15;
-      const totalSlots = slotsOnMonday + slotsOnTuesdayAfternoon + slotsOnTuesdayMorning;
+      const slotsOnTuesdayMorning = ((12 - 9) * 60) / 15;
+      const slotsOnTuesdayAfternoon = ((17 - 14) * 60) / 15;
+      const totalSlots =
+        slotsOnMonday + slotsOnTuesdayAfternoon + slotsOnTuesdayMorning;
 
       // expect there to be 1 less slot
       expect(slots.length).toBe(totalSlots - 1);
     });
-  })
-})
+  });
+});
