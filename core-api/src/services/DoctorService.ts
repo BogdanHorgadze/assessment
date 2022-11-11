@@ -50,7 +50,7 @@ export class DoctorService {
     });
 
     const generatedSlots = getAllDoctorSlots(avalibleDoctors);
-    console.log(generatedSlots,'slots')
+
     return getFilteredSlots(appointments, generatedSlots, from, to);
   }
 }

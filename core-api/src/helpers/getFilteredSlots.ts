@@ -24,7 +24,7 @@ function getFilteredSlots(
   const set = new Set();
   bookedSlots.forEach((slot) => set.add(JSON.stringify(slot)));
   const filteredSlots = slots.filter((slot) => !set.has(JSON.stringify(slot)));
-  console.log(filteredSlots.length, "kkkkkk");
+
   const eachDay = eachDayOfInterval({
     start: from,
     end: to,
