@@ -30,7 +30,7 @@ const Appointments = () => {
     () => setMinutes(setHours(nextMonday(new Date()), 9), 0),
     []
   );
-  const to = useMemo(() => setHours(addDays(from, 7), 10), [from]);
+  const to = useMemo(() => addDays(from, 7), [from]);
   const [slots, setSlots] = useState<SlotWithKey[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({} as Doctor);
   const [selectedSlot, setSelectedSlot] = useState<SlotWithKey>();
@@ -69,9 +69,6 @@ const Appointments = () => {
       if (selectedDoctor?.id) {
         const { data } = await getSlots();
         const slots = generateSlots(data?.slots);
-        slots?.forEach((slot) => {
-          console.log({ ...slot, start: new Date(slot.start) });
-        });
         setSlots(slots as SlotWithKey[]);
       } else {
         setSlots([]);
