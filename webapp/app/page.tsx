@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 
-import Home from '../views/Home';
+import Home from '../src/views/Home';
 
 const HomePage: NextPage = () => {
   return <Home />;

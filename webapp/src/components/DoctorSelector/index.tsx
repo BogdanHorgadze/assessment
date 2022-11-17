@@ -7,7 +7,7 @@ import { Doctor } from '@/generated/core.graphql';
 const DoctorSelector: FC<{
   doctors: Doctor[];
   value?: Doctor;
-  onChange: (doc: Doctor | undefined) => void;
+  onChange: (doc: Doctor) => void;
 }> = ({ doctors, value, onChange }) => {
   return (
     <Box>

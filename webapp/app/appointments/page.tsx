@@ -1,4 +1,4 @@
-import Appointments from '../../views/Appointments';
+import Appointments from '../../src/views/Appointments';
 
 const AppointmentsPage = () => {
   return <Appointments />;

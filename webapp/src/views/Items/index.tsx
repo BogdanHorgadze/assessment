@@ -1,3 +1,4 @@
+"use client";
 import { useCallback } from 'react';
 
 import { Box, Button, List, ListItem, Text } from '@chakra-ui/react';
@@ -24,7 +25,7 @@ export const Items = () => {
     } catch (ex) {
       console.log(ex);
     }
-  }, [addItem]);
+  }, [addItem, refetch]);
 
   if (loading) {
     return <Box>Loading...</Box>;
