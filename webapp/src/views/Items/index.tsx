@@ -1,3 +1,4 @@
+"use client";
 import { useCallback } from 'react';
 
 import { Box, Button, List, ListItem, Text } from '@chakra-ui/react';
